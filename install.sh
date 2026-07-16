@@ -93,10 +93,13 @@ chmod +x /etc/ppp/ip-down.d/60-acct
 
 echo ">> بهبود پایداری pppd + MSS clamp..."
 sed -i "s/^lcp-echo-interval.*/lcp-echo-interval 20/;s/^lcp-echo-failure.*/lcp-echo-failure 30/" /etc/ppp/options.xl2tpd 2>/dev/null || true
-iptables -t mangle -C FORWARD -p tcp --tcp-flags SYN,RST SYN -o ppp+ -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null || \
-iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -o ppp+ -j TCPMSS --clamp-mss-to-pmtu
-iptables -t mangle -C FORWARD -p tcp --tcp-flags SYN,RST SYN -i ppp+ -j TCPMSS --clamp-mss-to-pmtu 2>/dev/null || \
-iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -i ppp+ -j TCPMSS --clamp-mss-to-pmtu
+iptables -t mangle -C FORWARD -p tcp --tcp-flags SYN,RST SYN -o ppp+ -j TCPMSS --set-mss 1240 2>/dev/null || \
+iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -o ppp+ -j TCPMSS --set-mss 1240
+iptables -t mangle -C FORWARD -p tcp --tcp-flags SYN,RST SYN -i ppp+ -j TCPMSS --set-mss 1240 2>/dev/null || \
+iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -i ppp+ -j TCPMSS --set-mss 1240
+# Force QUIC (UDP 443) to fall back to TCP (fixes YouTube/Google over VPN)
+iptables -C FORWARD -i ppp+ -p udp --dport 443 -j REJECT --reject-with icmp-port-unreachable 2>/dev/null || \
+iptables -I FORWARD 1 -i ppp+ -p udp --dport 443 -j REJECT --reject-with icmp-port-unreachable
 netfilter-persistent save 2>/dev/null || true
 
 echo ">> نصب پنل..."
