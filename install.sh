@@ -11,13 +11,13 @@ set -e
 echo "==================================================="
 echo "        نصب پنل و سرور L2TP VPN"
 echo "==================================================="
-read -rp "دامنه پنل (مثال l2tp.example.com): " DOMAIN
-read -rp "ایمیل برای گواهی SSL: " EMAIL
-read -rp "نام کاربری ورود به پنل: " PANEL_USER
-read -rsp "رمز عبور ورود به پنل: " PANEL_PASS; echo
-read -rp "کلید مشترک IPsec (PSK): " VPN_PSK
-read -rp "اولین کاربر VPN (نام کاربری): " V1USER
-read -rsp "رمز اولین کاربر VPN: " V1PASS; echo
+[ -z "$DOMAIN" ] && read -rp "دامنه پنل (مثال l2tp.example.com): " DOMAIN
+[ -z "$EMAIL" ] && read -rp "ایمیل برای گواهی SSL: " EMAIL
+[ -z "$PANEL_USER" ] && read -rp "نام کاربری ورود به پنل: " PANEL_USER
+[ -z "$PANEL_PASS" ] && { read -rsp "رمز عبور ورود به پنل: " PANEL_PASS; echo; }
+[ -z "$VPN_PSK" ] && read -rp "کلید مشترک IPsec (PSK): " VPN_PSK
+[ -z "$V1USER" ] && read -rp "اولین کاربر VPN (نام کاربری): " V1USER
+[ -z "$V1PASS" ] && { read -rsp "رمز اولین کاربر VPN: " V1PASS; echo; }
 read -rp "پورت داخلی پنل [8088]: " PANEL_PORT; PANEL_PORT=${PANEL_PORT:-8088}
 DL_LIMIT="200mbit"; UL_LIMIT="20mbit"
 export DEBIAN_FRONTEND=noninteractive
